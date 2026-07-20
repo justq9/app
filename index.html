@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#07090d" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="LifeOS" />
+  <title>LifeOS</title>
+  <style>
+    :root{
+      --bg:#07090d;
+      --panel:#11151c;
+      --panel-2:#171c25;
+      --text:#f5f7fb;
+      --muted:#8f98a8;
+      --line:#252b36;
+      --accent:#64a7ff;
+      --accent-2:#9cc8ff;
+      --green:#54d39a;
+      --yellow:#f2c45d;
+      --red:#ff6b78;
+      --shadow:0 16px 40px rgba(0,0,0,.35);
+      --radius:22px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif}
+    body{min-height:100vh}
+    button,input,textarea,select{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:760px;margin:0 auto;min-height:100vh;padding:calc(env(safe-area-inset-top) + 18px) 16px calc(env(safe-area-inset-bottom) + 92px)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{font-size:28px;font-weight:800;letter-spacing:-.7px}
+    .date{font-size:13px;color:var(--muted);margin-top:2px}
+    .icon-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--text);display:grid;place-items:center}
+    .hero{background:linear-gradient(145deg,#151b25,#0e1218);border:1px solid var(--line);border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+    .eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--accent-2);font-weight:700}
+    .hero h1{font-size:30px;line-height:1.05;margin:8px 0 6px;letter-spacing:-1px}
+    .hero p{color:var(--muted);margin:0}
+    .progress-wrap{margin-top:20px}
+    .progress-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .score{font-weight:800}
+    .bar{height:12px;border-radius:999px;background:#202631;overflow:hidden}
+    .bar > span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),#8ebcff);border-radius:999px;transition:.35s ease}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+    .module{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:16px;text-align:left;color:var(--text)}
+    .module .emoji{font-size:23px}
+    .module strong{display:block;font-size:17px;margin-top:8px}
+    .module small{display:block;color:var(--muted);margin-top:5px}
+    .section-head{display:flex;align-items:center;justify-content:space-between;margin:24px 2px 10px}
+    .section-head h2{font-size:20px;margin:0}
+    .section-head button{border:0;background:none;color:var(--accent);padding:6px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+    .task{display:flex;align-items:center;gap:12px;padding:15px;border-bottom:1px solid var(--line)}
+    .task:last-child{border-bottom:0}
+    .check{width:25px;height:25px;border-radius:50%;border:2px solid #566071;background:transparent;flex:0 0 auto;display:grid;place-items:center;color:#07110d;font-size:15px;font-weight:900}
+    .task.done .check{background:var(--green);border-color:var(--green)}
+    .task-main{flex:1;min-width:0}
+    .task-title{font-size:16px}
+    .task.done .task-title{text-decoration:line-through;color:#7b8492}
+    .task-meta{font-size:12px;color:var(--muted);margin-top:3px}
+    .pill{font-size:11px;padding:5px 8px;border-radius:999px;background:#202631;color:var(--muted)}
+    .empty{padding:28px;text-align:center;color:var(--muted)}
+    .bottomnav{position:fixed;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));width:min(720px,calc(100% - 24px));background:rgba(17,21,28,.92);backdrop-filter:blur(18px);border:1px solid var(--line);border-radius:24px;padding:8px;display:grid;grid-template-columns:repeat(4,1fr);z-index:20}
+    .navbtn{border:0;background:transparent;color:var(--muted);padding:8px 4px;border-radius:16px;font-size:12px}
+    .navbtn span{display:block;font-size:20px;margin-bottom:2px}
+    .navbtn.active{background:var(--panel-2);color:var(--text)}
+    .view{display:none}
+    .view.active{display:block}
+    .subhead{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+    .subhead h1{font-size:27px;margin:0}
+    .back{border:1px solid var(--line);background:var(--panel);color:var(--text);width:42px;height:42px;border-radius:50%}
+    .group{margin-top:18px}
+    .group-title{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1.1px;margin:0 4px 8px}
+    .note{width:100%;min-height:120px;background:var(--panel);border:1px solid var(--line);border-radius:18px;color:var(--text);padding:15px;resize:vertical}
+    .field{margin-bottom:14px}
+    .field label{display:block;color:var(--muted);font-size:13px;margin:0 0 7px 3px}
+    .field input,.field select{width:100%;border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:15px;padding:14px}
+    .days{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+    .day{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:14px;padding:11px 0;text-align:center}
+    .day.active{background:var(--accent);border-color:var(--accent);color:#06101c;font-weight:800}
+    .primary{width:100%;border:0;border-radius:16px;padding:15px;background:var(--accent);color:#06101c;font-weight:800;margin-top:8px}
+    .secondary{width:100%;border:1px solid var(--line);border-radius:16px;padding:15px;background:var(--panel);color:var(--text);font-weight:700;margin-top:10px}
+    .danger{color:var(--red)}
+    .toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);background:#202631;color:var(--text);padding:12px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:50}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .smallprint{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="dashboardView" class="view active">
+      <div class="topbar">
+        <div>
+          <div class="brand">LifeOS</div>
+          <div class="date" id="todayDate"></div>
+        </div>
+        <button class="icon-btn" id="quickAdd" aria-label="Add task">＋</button>
+      </div>
+
+      <div class="hero">
+        <div class="eyebrow">Daily operations brief</div>
+        <h1 id="greeting">Good evening, Jaskirat</h1>
+        <p id="statusText">Everything starts with one completed action.</p>
+        <div class="progress-wrap">
+          <div class="progress-meta">
+            <span>Today's progress</span>
+            <span class="score" id="overallScore">0%</span>
+          </div>
+          <div class="bar"><span id="overallBar"></span></div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <button class="module" data-open="her">
+          <span class="emoji">❤️</span><strong>Her</strong><small id="herSummary">0 of 0 complete</small>
+        </button>
+        <button class="module" data-open="me">
+          <span class="emoji">👤</span><strong>Me</strong><small id="meSummary">0 of 0 complete</small>
+        </button>
+        <button class="module" data-open="review">
+          <span class="emoji">📊</span><strong>Debrief</strong><small>Review today</small>
+        </button>
+        <button class="module" data-open="settings">
+          <span class="emoji">⚙️</span><strong>Settings</strong><small>Schedules and data</small>
+        </button>
+      </div>
+
+      <div class="section-head">
+        <h2>Next actions</h2>
+        <button id="showAllBtn">View all</button>
+      </div>
+      <div class="card" id="nextActions"></div>
+
+      <div class="section-head"><h2>Daily note</h2></div>
+      <textarea id="dailyNote" class="note" placeholder="What matters today?"></textarea>
+    </section>
+
+    <section id="herView" class="view">
+      <div class="subhead"><button class="back" data-back>‹</button><h1>❤️ Her</h1></div>
+      <div id="herTasks"></div>
+    </section>
+
+    <section id="meView" class="view">
+      <div class="subhead"><button class="back" data-back>‹</button><h1>👤 Me</h1></div>
+      <div id="meTasks"></div>
+    </section>
+
+    <section id="reviewView" class="view">
+      <div class="subhead"><button class="back" data-back>‹</button><h1>📊 Daily Debrief</h1></div>
+      <div class="hero">
+        <div class="eyebrow">Today</div>
+        <h1 id="reviewScore">0%</h1>
+        <p id="reviewText">No actions completed yet.</p>
+      </div>
+      <div class="group">
+        <div class="group-title">Outstanding</div>
+        <div class="card" id="outstandingList"></div>
+      </div>
+    </section>
+
+    <section id="settingsView" class="view">
+      <div class="subhead"><button class="back" data-back>‹</button><h1>⚙️ Settings</h1></div>
+
+      <div class="field">
+        <label>Your display name</label>
+        <input id="displayName" value="Jaskirat" />
+      </div>
+
+      <div class="field">
+        <label>Wake-up call time</label>
+        <input id="wakeTime" type="time" value="05:30" />
+      </div>
+
+      <div class="field">
+        <label>Hair oil days</label>
+        <div class="days" id="hairDays"></div>
+      </div>
+
+      <div class="field">
+        <label>Gym days</label>
+        <div class="days" id="gymDays"></div>
+      </div>
+
+      <button class="primary" id="saveSettings">Save settings</button>
+      <button class="secondary" id="exportData">Export backup</button>
+      <button class="secondary" id="importData">Import backup</button>
+      <input id="importFile" type="file" accept="application/json" hidden />
+      <button class="secondary danger" id="resetData">Reset all data</button>
+      <p class="smallprint">Data is stored only in this browser. Export a backup before clearing Safari website data or changing phones.</p>
+    </section>
+  </main>
+
+  <nav class="bottomnav">
+    <button class="navbtn active" data-nav="dashboard"><span>⌂</span>Home</button>
+    <button class="navbtn" data-nav="her"><span>♥</span>Her</button>
+    <button class="navbtn" data-nav="me"><span>●</span>Me</button>
+    <button class="navbtn" data-nav="settings"><span>⚙</span>Settings</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const todayKey = () => new Date().toISOString().slice(0,10);
+
+    const defaultState = {
+      settings:{
+        displayName:'Jaskirat',
+        wakeTime:'05:30',
+        hairDays:[1,3,5],
+        gymDays:[1,3,5]
+      },
+      daily:{},
+      note:{}
+    };
+
+    const baseTasks = {
+      her:[
+        {id:'wake',title:'Wake-up call',group:'Morning',meta:'Support only if requested'},
+        {id:'water',title:'Water',group:'Morning'},
+        {id:'breakfast',title:'Healthy breakfast',group:'Morning'},
+        {id:'protein',title:'Protein',group:'Nutrition'},
+        {id:'vitamin',title:'Multivitamin',group:'Nutrition'},
+        {id:'gym',title:'Gym or movement',group:'Health',schedule:'gym'},
+        {id:'jobs',title:'Job applications',group:'Career'},
+        {id:'study',title:'Study pharmacology',group:'Career'},
+        {id:'skincare',title:'Skincare',group:'Self-care'},
+        {id:'hairoil',title:'Rosemary oil',group:'Hair',schedule:'hair'},
+        {id:'mood',title:'Support check-in',group:'Evening',meta:'Ask what kind of support she wants'}
+      ],
+      me:[
+        {id:'mwater',title:'Drink water',group:'Morning'},
+        {id:'mgym',title:'Workout or walk',group:'Health'},
+        {id:'stretch',title:'Stretch / mobility',group:'Health'},
+        {id:'budget',title:'Check finances',group:'Operations'},
+        {id:'work',title:'Review work priorities',group:'Operations'},
+        {id:'read',title:'Read or learn',group:'Growth'},
+        {id:'sleep',title:'Prepare for sleep',group:'Evening'}
+      ]
+    };
+
+    let state = loadState();
+
+    function loadState(){
+      try{
+        const saved = JSON.parse(localStorage.getItem('lifeos-state'));
+        return saved ? {...defaultState,...saved,settings:{...defaultState.settings,...saved.settings}} : structuredClone(defaultState);
+      }catch(e){ return structuredClone(defaultState); }
+    }
+    function saveState(){
+      localStorage.setItem('lifeos-state',JSON.stringify(state));
+    }
+    function dayData(){
+      const key=todayKey();
+      if(!state.daily[key]) state.daily[key]={};
+      return state.daily[key];
+    }
+    function visibleTasks(profile){
+      const dow=new Date().getDay();
+      return baseTasks[profile].filter(t=>{
+        if(t.schedule==='hair') return state.settings.hairDays.includes(dow);
+        if(t.schedule==='gym') return state.settings.gymDays.includes(dow);
+        return true;
+      });
+    }
+    function isDone(profile,id){ return !!dayData()[profile+'_'+id]; }
+    function toggle(profile,id){
+      dayData()[profile+'_'+id]=!isDone(profile,id);
+      saveState(); renderAll();
+    }
+    function progress(profile){
+      const tasks=visibleTasks(profile);
+      const done=tasks.filter(t=>isDone(profile,t.id)).length;
+      return {done,total:tasks.length,pct:tasks.length?Math.round(done/tasks.length*100):0};
+    }
+
+    function renderDate(){
+      const d=new Date();
+      document.getElementById('todayDate').textContent=d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+      const hour=d.getHours();
+      const greeting=hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+      document.getElementById('greeting').textContent=`${greeting}, ${state.settings.displayName}`;
+    }
+
+    function taskElement(profile,t){
+      const row=document.createElement('div');
+      row.className='task'+(isDone(profile,t.id)?' done':'');
+      row.innerHTML=`<button class="check" aria-label="Complete">${isDone(profile,t.id)?'✓':''}</button>
+        <div class="task-main"><div class="task-title">${t.title}</div>${t.meta?`<div class="task-meta">${t.meta}</div>`:''}</div>
+        <span class="pill">${t.group}</span>`;
+      row.querySelector('.check').onclick=()=>toggle(profile,t.id);
+      row.onclick=(e)=>{if(!e.target.classList.contains('check')) toggle(profile,t.id)};
+      return row;
+    }
+
+    function renderProfile(profile,containerId){
+      const container=document.getElementById(containerId);
+      container.innerHTML='';
+      const groups={};
+      visibleTasks(profile).forEach(t=>(groups[t.group]??=[]).push(t));
+      Object.entries(groups).forEach(([name,tasks])=>{
+        const wrap=document.createElement('div');
+        wrap.className='group';
+        wrap.innerHTML=`<div class="group-title">${name}</div>`;
+        const card=document.createElement('div'); card.className='card';
+        tasks.forEach(t=>card.appendChild(taskElement(profile,t)));
+        wrap.appendChild(card); container.appendChild(wrap);
+      });
+    }
+
+    function renderDashboard(){
+      const hp=progress('her'), mp=progress('me');
+      const total=hp.total+mp.total, done=hp.done+mp.done;
+      const pct=total?Math.round(done/total*100):0;
+      document.getElementById('overallScore').textContent=pct+'%';
+      document.getElementById('overallBar').style.width=pct+'%';
+      document.getElementById('herSummary').textContent=`${hp.done} of ${hp.total} complete`;
+      document.getElementById('meSummary').textContent=`${mp.done} of ${mp.total} complete`;
+      document.getElementById('statusText').textContent=pct===100?'All scheduled actions are complete.':pct>=70?'Strong progress. Close the remaining items.':pct>=30?'Operations are moving. Keep going.':'Everything starts with one completed action.';
+      const next=document.getElementById('nextActions'); next.innerHTML='';
+      const outstanding=[
+        ...visibleTasks('her').filter(t=>!isDone('her',t.id)).map(t=>({profile:'her',...t})),
+        ...visibleTasks('me').filter(t=>!isDone('me',t.id)).map(t=>({profile:'me',...t}))
+      ].slice(0,4);
+      if(!outstanding.length) next.innerHTML='<div class="empty">Mission complete for today.</div>';
+      else outstanding.forEach(t=>next.appendChild(taskElement(t.profile,t)));
+      document.getElementById('dailyNote').value=state.note[todayKey()]||'';
+      renderReview(pct,done,total);
+    }
+
+    function renderReview(pct,done,total){
+      document.getElementById('reviewScore').textContent=pct+'%';
+      document.getElementById('reviewText').textContent=done?`${done} of ${total} scheduled actions completed.`:'No actions completed yet.';
+      const box=document.getElementById('outstandingList'); box.innerHTML='';
+      const outstanding=[
+        ...visibleTasks('her').filter(t=>!isDone('her',t.id)).map(t=>({profile:'her',...t})),
+        ...visibleTasks('me').filter(t=>!isDone('me',t.id)).map(t=>({profile:'me',...t}))
+      ];
+      if(!outstanding.length) box.innerHTML='<div class="empty">Nothing outstanding.</div>';
+      else outstanding.forEach(t=>box.appendChild(taskElement(t.profile,t)));
+    }
+
+    function renderDays(id,selected){
+      const el=document.getElementById(id); el.innerHTML='';
+      DAYS.forEach((d,i)=>{
+        const b=document.createElement('button'); b.className='day'+(selected.includes(i)?' active':''); b.textContent=d[0];
+        b.onclick=()=>{ const arr=id==='hairDays'?state.settings.hairDays:state.settings.gymDays; const ix=arr.indexOf(i); ix>=0?arr.splice(ix,1):arr.push(i); renderSettings(); };
+        el.appendChild(b);
+      });
+    }
+
+    function renderSettings(){
+      document.getElementById('displayName').value=state.settings.displayName;
+      document.getElementById('wakeTime').value=state.settings.wakeTime;
+      renderDays('hairDays',state.settings.hairDays);
+      renderDays('gymDays',state.settings.gymDays);
+    }
+
+    function renderAll(){
+      renderDate();
+      renderProfile('her','herTasks');
+      renderProfile('me','meTasks');
+      renderDashboard();
+      renderSettings();
+    }
+
+    function showView(name){
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      document.getElementById(name+'View').classList.add('active');
+      document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.nav===name));
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function toast(msg){
+      const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+      clearTimeout(window._toast); window._toast=setTimeout(()=>t.classList.remove('show'),1800);
+    }
+
+    document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>showView(b.dataset.open));
+    document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=()=>showView(b.dataset.nav));
+    document.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>showView('dashboard'));
+
+    document.getElementById('dailyNote').addEventListener('input',e=>{state.note[todayKey()]=e.target.value;saveState();});
+    document.getElementById('showAllBtn').onclick=()=>showView('her');
+
+    document.getElementById('quickAdd').onclick=()=>{
+      const title=prompt('New task for today:');
+      if(!title) return;
+      const id='custom_'+Date.now();
+      baseTasks.me.push({id,title,group:'Custom'});
+      toggle('me',id);
+      toast('Task added');
+    };
+
+    document.getElementById('saveSettings').onclick=()=>{
+      state.settings.displayName=document.getElementById('displayName').value.trim()||'Jaskirat';
+      state.settings.wakeTime=document.getElementById('wakeTime').value||'05:30';
+      saveState(); renderAll(); toast('Settings saved');
+    };
+
+    document.getElementById('exportData').onclick=()=>{
+      const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='lifeos-backup-'+todayKey()+'.json'; a.click(); URL.revokeObjectURL(a.href);
+    };
+
+    document.getElementById('importData').onclick=()=>document.getElementById('importFile').click();
+    document.getElementById('importFile').onchange=async e=>{
+      try{
+        const text=await e.target.files[0].text();
+        state=JSON.parse(text); saveState(); renderAll(); toast('Backup imported');
+      }catch(err){ alert('That backup file could not be imported.'); }
+    };
+
+    document.getElementById('resetData').onclick=()=>{
+      if(confirm('Reset all LifeOS data on this device?')){
+        state=structuredClone(defaultState); saveState(); renderAll(); toast('Data reset');
+      }
+    };
+
+    renderAll();
+  </script>
+</body>
+</html>
